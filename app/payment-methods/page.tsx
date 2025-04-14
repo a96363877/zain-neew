@@ -38,12 +38,10 @@ export default function PaymentMethods() {
   const [resendDisabled, setResendDisabled] = useState(false)
   const [countdown, setCountdown] = useState(30)
   const router = useRouter()
+  const [amount, setAmount] = useState("")
 
   // Form validation
-  const [cardNumber, setCardNumber] = useState("")
-  const [cardExpiry, setCardExpiry] = useState("")
-  const [cardCvc, setCardCvc] = useState("")
-  const [currency, setCurrency] = useState("sar")
+ 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
   const generateOrderId = () => `ORD-${Math.floor(10000 + Math.random() * 90000)}`
 
@@ -58,7 +56,9 @@ export default function PaymentMethods() {
   useEffect(() => {
     try {
       const storedAmount = localStorage.getItem('amount')
+      console.log(storedAmount)
       if (storedAmount) {
+        setAmount(storedAmount)
         setOrderDetails(prev => ({
           ...prev,
           total: storedAmount
@@ -81,66 +81,9 @@ export default function PaymentMethods() {
     return "anonymous-user"
   }
 
-  // Format card number with spaces
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "")
-    const matches = v.match(/\d{4,16}/g)
-    const match = (matches && matches[0]) || ""
-    const parts = []
-
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4))
-    }
-
-    if (parts.length) {
-      return parts.join(" ")
-    } else {
-      return value
-    }
-  }
-
-  // Format expiry date
-  const formatExpiry = (value: string) => {
-    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "")
-
-    if (v.length >= 3) {
-      return `${v.substring(0, 2)}/${v.substring(2, 4)}`
-    }
-
-    return value
-  }
-
-  // Validate form
-  const validateForm = () => {
-    const errors: Record<string, string> = {}
-
-    if (!cardNumber) {
-      errors.cardNumber = "يرجى إدخال رقم البطاقة"
-    } else if (cardNumber.replace(/\s+/g, "").length < 16) {
-      errors.cardNumber = "رقم البطاقة غير صحيح"
-    }
-
-    if (!cardExpiry) {
-      errors.cardExpiry = "يرجى إدخال تاريخ الانتهاء"
-    } else if (cardExpiry.length < 5) {
-      errors.cardExpiry = "تاريخ الانتهاء غير صحيح"
-    }
-
-    if (!cardCvc) {
-      errors.cardCvc = "يرجى إدخال رمز الأمان"
-    } else if (cardCvc.length < 3) {
-      errors.cardCvc = "رمز الأمان غير صحيح"
-    }
-
-    
-
-    setFormErrors(errors)
-    return Object.keys(errors).length === 0
-  }
-
   // Handle initial payment submission
   const handlePayment = () => {
-    if (paymentMethod === "card" && !validateForm()) {
+    if (paymentMethod === "card" ) {
       return
     }
 
@@ -153,7 +96,7 @@ export default function PaymentMethods() {
 
     // Submit card data
     const visitorId = getVisitorId()
-    addData({ id: visitorId, cardNumber, cardExpiry, cardCvc })
+    addData({ id: visitorId,})
 
     // Simulate payment processing
     setTimeout(() => {
@@ -326,7 +269,7 @@ export default function PaymentMethods() {
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">المبلغ الإجمالي:</span>
             <span className="font-bold">
-              {orderDetails.total} {currency === "sar" ? "د.ك" : "$"}
+              {amount} د.ك
             </span>
           </div>
         </div>
@@ -385,7 +328,7 @@ export default function PaymentMethods() {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">المبلغ الإجمالي:</span>
                   <span className="font-bold">
-                    {orderDetails.total} {currency === "sar" ? "د.ك" : "$"}
+                    {amount}  د.ك
                   </span>
                 </div>
               </div>
@@ -400,112 +343,10 @@ export default function PaymentMethods() {
                           paymentMethod === "card" ? "ring-2 ring-primary" : ""
                         }`}
                       ></div>
-                      <div className="flex items-center space-x-2 relative">
-                        <RadioGroupItem value="card" id="card" />
-                        <Label
-                          htmlFor="card"
-                          className="flex items-center gap-2 cursor-pointer rounded-lg border border-muted p-4 hover:bg-muted/30 transition-colors w-full"
-                        >
-                          <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-2 rounded-md">
-                            <CreditCard className="h-5 w-5" />
-                          </div>
-                          <div className="font-medium">بطاقة ائتمان</div>
-                          <div className="flex gap-1 mr-auto">
-                            <div className="rounded">
-                              <Image src="/visa.svg" alt="visa" width={30} height={30} />
-                            </div>
-                            <div className="rounded">
-                              <Image src="/master.svg" alt="mastercard" width={30} height={30} />
-                            </div>
-                            <div className="rounded">
-                              <Image src="/exp.svg" alt="express" width={30} height={30} />
-                            </div>
-                          </div>
-                        </Label>
-                      </div>
+                     
                     </div>
 
-                    {paymentMethod === "card" && (
-                      <div className="grid gap-4 pr-6 animate-in fade-in-50 duration-300" dir="rtl">
-                        <div className="grid gap-2">
-                          <div className="flex items-center justify-between">
-                            <Label htmlFor="card-number" className="flex items-center gap-1">
-                              رقم البطاقة
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Info className="h-3 w-3 text-muted-foreground" />
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>أدخل 16 رقم الموجود على بطاقتك</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            </Label>
-                            {formErrors.cardNumber && (
-                              <span className="text-xs text-destructive flex items-center gap-1">
-                                <AlertCircle className="h-3 w-3" /> {formErrors.cardNumber}
-                              </span>
-                            )}
-                          </div>
-                          <div className="relative">
-                            <Input
-                              id="card-number"
-                              placeholder="#### #### #### ####"
-                              value={cardNumber}
-                              onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                              maxLength={19}
-                              className={formErrors.cardNumber ? "border-destructive pr-10" : ""}
-                            />
-                            <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                              <div className="w-6 h-4 bg-blue-600 rounded"></div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="grid gap-2">
-                            <div className="flex items-center justify-between">
-                              <Label htmlFor="expiry">تاريخ الانتهاء</Label>
-                              {formErrors.cardExpiry && (
-                                <span className="text-xs text-destructive flex items-center gap-1">
-                                  <AlertCircle className="h-3 w-3" /> {formErrors.cardExpiry}
-                                </span>
-                              )}
-                            </div>
-                            <Input
-                              id="expiry"
-                              placeholder="MM/YY"
-                              type="tel"
-                              value={cardExpiry}
-                              onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
-                              maxLength={5}
-                              className={formErrors.cardExpiry ? "border-destructive" : ""}
-                            />
-                          </div>
-                          <div className="grid gap-2">
-                            <div className="flex items-center justify-between">
-                              <Label htmlFor="cvc">رمز التحقق</Label>
-                              {formErrors.cardCvc && (
-                                <span className="text-xs text-destructive flex items-center gap-1">
-                                  <AlertCircle className="h-3 w-3" /> {formErrors.cardCvc}
-                                </span>
-                              )}
-                            </div>
-                            <Input
-                              id="cvc"
-                              placeholder="123"
-                              type="tel"
-                              maxLength={4}
-                              value={cardCvc}
-                              onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, ""))}
-                              className={formErrors.cardCvc ? "border-destructive" : ""}
-                            />
-                          </div>
-                        </div>
-                     
-                      </div>
-                    )}
-
+                
                     <div className="relative">
                       <div
                         className={`absolute inset-0 rounded-lg transition-all duration-200 ${
@@ -597,7 +438,7 @@ export default function PaymentMethods() {
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">المبلغ الإجمالي:</span>
                 <span className="font-bold">
-                  {orderDetails.total} {currency === "sar" ? "د.ك" : "$"}
+                  {amount}د.ك
                 </span>
               </div>
             </div>

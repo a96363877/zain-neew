@@ -174,9 +174,12 @@ readOnly
                     key={amount.value}
                     className={`flex justify-between p-3 cursor-pointer hover:bg-gray-50 ${selectedAmount === amount.value ? "bg-gray-50" : ""}`}
                     onClick={() => {
+                      localStorage.setItem('amount',selectedAmount)
+
                       setSelectedAmount(amount.value)
                       setShowAmountDropdown(false)
                       localStorage.setItem('amount',selectedAmount)
+                      console.log(selectedAmount)
                     }}
                   >
                     <div className="flex items-center">
