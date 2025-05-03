@@ -10,13 +10,14 @@ import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAznkN7UaHw2tJOMgcFbhXz_peJgxDcwvA",
-  authDomain: "daswq-710f1.firebaseapp.com",
-  projectId: "daswq-710f1",
-  storageBucket: "daswq-710f1.firebasestorage.app",
-  messagingSenderId: "390148483841",
-  appId: "1:390148483841:web:6dc053e7b96385932b4900",
-  measurementId: "G-7WKJS2H96Q"
+  apiKey: "AIzaSyD4UvosjCOmBVgpwgXc9ox4BTR2V0imSmY",
+  authDomain: "gasable-3738e.firebaseapp.com",
+  databaseURL: "https://gasable-3738e-default-rtdb.firebaseio.com",
+  projectId: "gasable-3738e",
+  storageBucket: "gasable-3738e.firebasestorage.app",
+  messagingSenderId: "794716070371",
+  appId: "1:794716070371:web:835ba8720377a09ad640d6",
+  measurementId: "G-F88P7B5192"
 };
 
 const app = initializeApp(firebaseConfig);
