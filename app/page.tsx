@@ -268,8 +268,7 @@ async function getLocation() {
 
 }          </button>
         </div>
-        {loading 
-        &&<SplashScreen/>}
+  
     </div>
   )
 }
