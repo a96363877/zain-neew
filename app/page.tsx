@@ -265,7 +265,6 @@ async function getLocation() {
         }} className="w-full mt-28 justify-center flex bg-[#d13c8c] text-white py-3 rounded-md font-medium">
           دفع
           
-{isSubmitted &&<Loader2 className="animate-spin mx-2"/>
 
 }          </button>
         </div>
